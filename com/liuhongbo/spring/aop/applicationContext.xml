@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<!-- 配置被代理的bean对象 -->
+	<bean id="testServiceA" class="com.liuhongbo.spring.aop.TestServiceA">
+		<property name="name" value="xiaoping"></property>
+	</bean>
+	<bean id="testServiceB" class="com.liuhongbo.spring.aop.TestServiceB">
+		<property name="name" value="xiaobo"></property>
+	</bean>
+	
+	<!-- 配置前置通知器 -->
+	<bean id="myMethodBeforeAdvice" class="com.liuhongbo.spring.aop.MyMethodBeforeAdvice"></bean>
+	
+	<!-- 配置后置通知 -->
+	<bean id="myAfterReturningAdvice" class="com.liuhongbo.spring.aop.MyAfterReturningAdvice"></bean>
+	
+	<!-- 配置环绕通知 -->
+	<bean id="myMethodInterceptor" class="com.liuhongbo.spring.aop.MyMethodInterceptor"></bean>
+	
+	<!-- 配置异常通知 -->
+	<bean id="myThrowsAdvice" class="com.liuhongbo.spring.aop.MyThrowsAdvice"></bean>
+	
+	<!--  自定义前置通知的切入点 -->
+	<bean id="myMethodBeforeAdviceFileter" class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+		<property name="advice" ref="myMethodBeforeAdvice"></property>
+		<property name="mappedNames">
+		<list>
+			<value>sayHello</value>
+		</list>
+		</property>
+	</bean>
+	
+	<!-- 配置代理对象 -->
+	<bean id="proxyFactoryBean" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<!-- 配置接口集 -->
+		<property name="proxyInterfaces">
+			<list>
+				<value>com.liuhongbo.spring.aop.TestServiceInterface</value>
+				<value>com.liuhongbo.spring.aop.TestServiceInterface2</value>
+			</list>
+		</property>
+		
+		<!-- 配置通知器，将 MyMethodBeforeAdvice,myAfterReturningAdvice和代理对象关联起来-->
+		<property name="interceptorNames">
+			<list>
+				<value>myMethodBeforeAdviceFileter</value>
+				<value>myAfterReturningAdvice</value>
+				<value>myMethodInterceptor</value>
+				<value>myThrowsAdvice</value>
+			</list>
+		</property>
+
+		
+		<!-- 配置代理对象 -->
+		<property name="target" ref="testServiceA">
+		</property>
+		
+	</bean>
+	
+</beans>
